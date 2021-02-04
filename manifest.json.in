@@ -1,0 +1,15 @@
+{
+    "name": "testwebchannel.fulvio",
+    "description": "no oxide app",
+    "architecture": "@CLICK_ARCH@",
+    "title": "testWebChannel",
+    "hooks": {
+        "testWebChannel": {
+            "apparmor": "testWebChannel.apparmor",
+            "desktop":  "testWebChannel.desktop"
+        }
+    },
+    "version": "1.0.3",
+    "maintainer": "fulvio <fulvio@mail.com>",
+    "framework" : "@CLICK_FRAMEWORK@"
+}
