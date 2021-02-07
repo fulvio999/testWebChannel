@@ -3,10 +3,10 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 
-        <link rel="stylesheet" href="qrc:/bootstrap.min.css">
+        <link rel="stylesheet" href="bootstrap.min.css">
 
         <!-- that's a special resource with JS-library for WebChannel -->
-        <script type="text/javascript" src="qrc:/qwebchannel.js"></script>
+        <script type="text/javascript" src="qwebchannel.js"></script>
 
         <script type="text/javascript">
 
@@ -20,69 +20,83 @@
                 socket.onopen = function()
                 {
                     new QWebChannel(socket, function(channel) {
-                        // all published objects are available in channel.objects under
-                        // the identifier set in their attached WebChannel.id property
+                        /*
+                          all published objects are available in channel.objects under
+                          the identifier set in their attached WebChannel.id property
+                         (ie 'backend' in our identifier)
+                        */
                         backend = channel.objects.backend;
 
-                        // connect to a signal
+                        /*
+                           connect to a signal named 'someSignal' emitted by QML to
+                           receive it when raised and execute a callback function
+                        */
                         backend.someSignal.connect(function(someText) {
-                            alert("Got signal: " + someText);
+                            console.log("From QML got value: " + someText);
+                            /* update html page using received value */
                             document.getElementById("lbl").innerHTML = someText;
                         });
                     });
                 };
 
                 socket.onerror = function(evt) {
-                    alert("on error");
+                    console.log("on error");
                 }
 
                 socket.onmessage = function (evt)
                 {
                     var received_msg = evt.data;
-                    alert("Message is received: " + received_msg);
+                    console.log("Message is received: " + received_msg);
                 };
 
                 socket.onclose = function(evt)
                 {
                     // websocket is closed.
-                    alert("Connection is closed: " + evt.code + " - " + evt.reason);
+                    console.log("Connection is closed: " + evt.code + " - " + evt.reason);
                 };
             }
 
-            // just to demonstrate you async interaction
-            var result = "ololo";
+
+            var result = "waiting...";
+
+            /* Function called when the Send button is pressed: NOTE: is an async interaction with html */
             function changeLabel()
             {
+                /* the value to send at HTML */
                 var textInputValue = document.getElementById("input").value.trim();
+
                 if (textInputValue.length === 0)
                 {
-                    alert("You haven't entered anything!");
+                    console.log("You haven't entered anything!");
                     return;
                 }
 
-                // invoke a method, and receive the return value asynchronously
+                /* invoke a function named 'changeText' defined in QML,
+                   and receive his returned value asynchronously */
                 backend.changeText(textInputValue, function(callback) {
-                    //processThisShit(callback);
                     result = callback;
-                    // since it's async, this alert will appear later and show the actual result
-                    alert(result);
+                    // since it's async, this log will appear later and show the actual result
+                    console.log(result);
                     // reset variable back to default value
-                    result = "ololo";
+                    result = "waiting...";
                 });
-                // this alert will appear first and show default "ololo"
-                alert(result);
+                /* this alert will appear first and show default "waiting..." */
+                console.log(result);
             }
 
-            // you can also read/write properties of QtObject from QML side
+            /* you can also read/write properties of QtObject from QML side.
+               This function is called when the html label whith the QML response is clicked
+            */
             function getPropertyValue()
             {
                 var originalValue = backend.someProperty;
+                document.getElementById("lbl").innerHTML = originalValue;
 
-                alert(backend.someProperty);
-                backend.someProperty = "some another value";
-                alert(backend.someProperty);
+                //console.log(backend.someProperty);
+                //backend.someProperty = "some another value";
+                //console.log(backend.someProperty);
 
-                backend.someProperty = originalValue;
+                //backend.someProperty = originalValue;
             }
 
         </script>
@@ -103,6 +117,10 @@
     </head>
     <body>
 
+        <div align="center">
+            I am an HTML page
+        </div>
+
         <div class="container centered">
             <div class="input-group mb-3">
                 <input id="input" type="text" class="form-control"/>
@@ -113,8 +131,8 @@
                 </div>
             </div>
             <div style="text-align:center;">
-                A text label (click on it):
-                    <span id="lbl" onclick="getPropertyValue();">some value</span>
+                QML Response:
+                    <span id="lbl" onclick="getPropertyValue();"></span>
             </div>
         </div>
 
