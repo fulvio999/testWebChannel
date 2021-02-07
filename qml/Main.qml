@@ -145,11 +145,17 @@ MainView {
             border.width: 2
             border.color: "blue"
 
+            WebContext {
+                id: webcontext
+                userAgent: "Mozilla/5.0 (Linux; Android 5.0; Nexus 5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/38.0.2125.102 Mobile Safari/537.36"
+            }
+
             WebView {
                 id: webView
                 anchors.fill: parent
                 anchors.margins: 5
                 url: Qt.resolvedUrl('./www/index.html')
+                context: webcontext
                 onLoadingChanged: {
                     if (loadRequest.errorString)
                     {
