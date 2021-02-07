@@ -20,6 +20,10 @@
 #include <QString>
 #include <QQuickView>
 
+
+
+
+
 int main(int argc, char *argv[])
 {
     QGuiApplication *app = new QGuiApplication(argc, (char**)argv);
