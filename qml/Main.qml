@@ -22,7 +22,13 @@ import Qt.labs.settings 1.0
 import Morph.Web 0.1
 import QtWebEngine 1.7
 
+
 import TransportPlugin 1.0
+
+
+//example: https://doc-snapshots.qt.io/qt5-5.12/qtwebsockets-qmlwebsocketclient-example.html
+import QtWebSockets 1.0
+import QtWebChannel 1.0
 
 MainView {
     id: root
@@ -52,21 +58,28 @@ MainView {
             }
 
 
-            // an object with properties, signals and methods - just like any normal Qt object
+        // an object with properties, signals and methods - just like any normal Qt object
         QtObject {
             id: someObject
 
-            // ID, under which this object will be known at WebEngineView side
+            /*
+               ID, under which this object will be known at WebEngineView side (ie HTML page)
+               This ID is used in the HTML page to read some property vales in the QML page
+            */
             WebChannel.id: "backend"
 
-            property string someProperty: "Break on through to the other side"
+            /* A sample property that can be accessed from html using the WebChannel.id value */
+            property string someProperty: "I am QML property value"
 
+            /* emit a signal named 'someSignal' that will be catched on html side */
             signal someSignal(string message);
 
-            function changeText(newText) {
-                console.log(newText);
-                txt.text = newText;
-                return "New text length: " + newText.length;
+            /* Update QML using received value from HTML
+               Function called from HTML when the use press "Send" button */
+            function changeText(receivedText) {
+                console.log(receivedText);
+                txt.text = "Received: "+receivedText;
+                return "Received Text length: " + receivedText.length;
             }
         }
 
@@ -89,9 +102,12 @@ MainView {
             onErrorStringChanged: {
                 console.log(qsTr("Server error: %1").arg(errorString));
             }
-//            Component.onCompleted: {
-//                console.log(server.url);
-//            }
+
+            /* Enable for DEBUG
+              Component.onCompleted: {
+                  console.log(server.url);
+              }
+            */
         }
 
         Rectangle {
@@ -100,14 +116,24 @@ MainView {
             border.width: 2
             border.color: "green"
 
+            Label {
+                text:"I am a QML page"
+                anchors {
+                    horizontalCenter: parent.horizontalCenter
+                    topMargin: units.gu(4)
+                }
+            }
+
+            /* show the text received from HTML page and raise a signal that will be received by html */
             Text {
                 id: txt
                 anchors.centerIn: parent
-                font.pixelSize: 40
+                font.pixelSize: 20
                 color: "green"
-                text: "Some text"
                 onTextChanged: {
-                    // this signal will trigger a function at WebView side (if connected)
+                    /* this signal will trigger a function at WebView side (ie: HTML page) (if html is connected
+                       at this signl, see index.html)
+                    */
                     someObject.someSignal(text)
                 }
             }
@@ -123,10 +149,12 @@ MainView {
                 id: webView
                 anchors.fill: parent
                 anchors.margins: 5
-                url: "qrc:/index.html" //"file:" + applicationDirPath + "/index.html" //"http://192.168.100.8:8080/index.html"
+                url: Qt.resolvedUrl('./www/index.html')
                 onLoadingChanged: {
                     if (loadRequest.errorString)
-                        { console.error(loadRequest.errorString); }
+                    {
+                      console.error(loadRequest.errorString);
+                    }
                 }
             }
 
@@ -135,9 +163,6 @@ MainView {
                 registeredObjects: [someObject]
             }
         }
-
-
-
 
         }
     } //page
