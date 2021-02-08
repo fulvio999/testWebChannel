@@ -1,10 +1,14 @@
-# testWebChannel
+# testWebChannel UBports App
 
-Demo App about QML <---> HTML communication using WebChannel instead of Oxide library (deprecated on UBports devices).
+Demo App about QML <---> HTML communication using QT WebChannel instead of Oxide library (deprecated on UBports devices).
 Currently run only on desktop using 'clickable' with the command:
 clickable desktop
 
-Credits: Source code and idea based from: https://retifrav.github.io/blog/2018/07/14/html-from-qml-over-webchannel-websockets/  (Thanks)
+Running on device there is this blocking issue: https://github.com/fulvio999/testWebChannel/issues/1
+
+Credits: 
+- Source code and idea based from: https://retifrav.github.io/blog/2018/07/14/html-from-qml-over-webchannel-websockets/  (Thanks)
+- Chris Clime "Balcy" for some suggestions
 
 ## License
 
